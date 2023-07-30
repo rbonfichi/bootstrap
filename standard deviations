@@ -1,0 +1,49 @@
+# Bootstrap analysis to estimate if the Standard Deviations of two data series statistically differ or not
+
+# Read data:
+
+df <- read.csv2("C:/Users/Utente/Desktop/assay.csv")
+data1 <- df$assay_1
+data2 <- df$assay_2
+
+#set up the bootstrap
+
+B <- 500 #number of replicates
+n <- nrow(df) #sample size
+R <- numeric(B) #storage for replicates
+
+
+# bootstrap estimate the ratio of standard deviations of the two data series data1 and data2
+set.seed(1) # to get reproducible results
+
+for (b in 1:B) {
+  #randomly select the indices
+  i <- sample(1:n, size = n, replace = TRUE)
+  data1_resampled <- df$assay_1[i] #i is a vector of indices
+  data2_resampled <- df$assay_2[i]
+  a1 <- sd(data1_resampled)
+  a2 <- sd(data2_resampled)
+  R[b] <- (a1/a2)
+}
+
+# output
+round(mean(R), 4)
+hist(R, prob = TRUE, main = 'Histogram of standard deviation ratios calculated on resampled data', xlab = "standard deviation ratios", col='steelblue')
+
+
+# Check for normality of the vector containing the sd ratios (vector R) using QQ plot
+qqnorm(R, main='QQ plot of standard deviation ratios calculated on resampled data', pch = 1, col = "blue", frame = FALSE)
+qqline(R, col = "red", lwd = 2)
+
+# Check for normality of vector R using Shapiro-Wilk test
+shapiro.test(R)
+
+# Check for normality of vector R using Kolmogorov-Smirnov test
+ks.test(R, 'pnorm')
+
+# One-sample t-test to check if mean sd ratio is significantly different from 1 or not
+t.test(R, mu = 1)
+
+# Wilcoxon signed-rank test to test whether the median of the standard 
+# deviation ratios differs from 1
+wilcox.test(R, mu = 1)
