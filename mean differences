@@ -1,22 +1,19 @@
-# Estimation of mean differences (adapted from M.L. Rizzo "Statistical Computing with R" page 216)
+# Estimation of mean differences
 
 # Read data:
+data <- read.csv2("C:/Users/Utente/Desktop/assay.csv")
+data1 <- data$assay_1; data1
+mean(data1)
 
-data <- read.csv2("C:/Users/Utente/Desktop/articolo 14 chunky data/assay.csv")
-head(dati)
+data2 <- data$assay_2; data2
+mean(data2)
 
-data_1 <- data$assay_1; data_1
-mean(dati_1)
-
-data_2 <- data$assay_2; data_2
-mean(dati_2)
-
-mean_iniziale <- mean(dati_1) - mean(dati_2); mean_iniziale
+initial_mean <- mean(data1) - mean(data2); initial_mean
 
 #set up the bootstrap
 
 B <- 500 #number of replicates
-n <- nrow(dati) #sample size
+n <- nrow(data) #sample size
 R <- numeric(B) #storage for replicates
 
 # bootstrap estimate of the difference of the means
@@ -24,39 +21,30 @@ R <- numeric(B) #storage for replicates
 for (b in 1:B) {
   #randomly select the indices
   i <- sample(1:n, size = n, replace = TRUE)
-    dati_1 <- dati$assay_1[i] #i is a vector of indices
-    dati_2 <- dati$assay_2[i]
-    R[b] <- mean(dati_1)- mean(dati_2)
+    data1_resampled <- data$assay_1[i] #i is a vector of indices
+    data2_resampled <- data$assay_2[i]
+    R[b] <- mean(data1_resampled)- mean(data2_resampled)
 }
 
 #output
 
 print(paste("Bootstrap estimate:", round(R, digits = 2)))
-
 mean(R)
-
 hist(R, prob = TRUE,  col='steelblue', main = "Histogram of the differences of the means", xlab = "Differences of the means")
-
 
 # check for normality of the vector containing the mean differences (vector R) using QQ plot
 
 qqnorm(R, main='QQ plot of the differences of the means',pch = 1,col = "blue", frame = FALSE)
 qqline(R, col = "red", lwd = 2)
 
-
 # check for normality of the vector containing the mean differences (vector R) using Shapiro-Wilk test
-
 shapiro.test(R)
 
-
-
 # 1-Sample t-test to check if mean difference is significantly different from 0 or not
-
 t.test(R, mu = 0)
 
 # Wilcoxon signed-rank test to test whether the median of the standard 
 # deviation ratios differs from 1.
-
 wilcox.test(R, mu = 0)
 
 
