@@ -1,0 +1,41 @@
+# Estimation of CI for the difference between the means and the varuances of the two groups of data
+# Read data:
+df <- read.csv2("C:/Users/Utente/Desktop/articolo 14 chunky data/assay.csv")
+data1 <- df$assay_1
+data2 <- df$assay_2
+
+# Number of bootstraps
+n_bootstraps <- 1000
+
+# Length original data
+n <- nrow(df)
+
+# Initialize vectors to store bootstrap means and variances
+bootstrap_means_data1 <- numeric(n_bootstraps)
+bootstrap_means_data2 <- numeric(n_bootstraps)
+bootstrap_vars_data1 <- numeric(n_bootstraps)
+bootstrap_vars_data2 <- numeric(n_bootstraps)
+
+# Generate bootstrap samples and calculate means and variances
+for (i in 1:n_bootstraps) {
+  bootstrap_sample_data1 <- sample(data1, n, replace = TRUE)
+  bootstrap_sample_data2 <- sample(data2, n, replace = TRUE)
+  
+  bootstrap_means_data1[i] <- mean(bootstrap_sample_data1)
+  bootstrap_means_data2[i] <- mean(bootstrap_sample_data2)
+  
+  bootstrap_vars_data1[i] <- var(bootstrap_sample_data1)
+  bootstrap_vars_data2[i] <- var(bootstrap_sample_data2)
+}
+
+# Calculates the differences between the bootstrap means and variances
+mean_differences <- bootstrap_means_data1 - bootstrap_means_data2
+var_differences <- bootstrap_vars_data1 - bootstrap_vars_data2
+
+# Calculate 95% confidence intervals for differences
+mean_difference_ci <- quantile(mean_differences, c(0.025, 0.975))
+var_difference_ci <- quantile(var_differences, c(0.025, 0.975))
+
+# Print confidence intervals
+print(round(mean_difference_ci, digits =4))
+print(round(var_difference_ci, digits = 4))
