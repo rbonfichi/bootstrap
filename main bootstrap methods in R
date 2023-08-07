@@ -1,0 +1,117 @@
+# MAIN BOOTSTRAP METHODS IN R
+
+# Let's create first a small numerical data set:
+
+set.seed(123) # for reproducibility
+my_data <- rnorm(30, mean=5, sd=2)
+
+
+# CLASSICAL BOOTSTRAP:
+
+library(boot)
+# define the statistic:
+stat_fun <- function(data, indices) {
+  return(mean(data[indices]))
+}
+# perform classical bootstrap:
+boot_out <- boot(my_data, stat_fun, R=1000)
+# get bootstrap CI:
+boot.ci(boot_out, type="bca")
+
+
+
+# BIAS-CORRECTED BOOTSTRAP: 
+# This is similar to the classical bootstrap but adjusts for bias. 
+# The previous boot.ci function with type "bca" already provided this.
+
+
+
+# T-BOOTSTRAP: 
+# Here we are using the studentized bootstrap method
+
+# define the statistic:
+stat_fun <- function(data, indices) {
+  d <- data[indices]
+  return(mean(d)/sd(d)/sqrt(length(d)))
+}
+# perform bootstrap:
+boot_out <- boot(my_data, stat_fun, R=1000)
+# get bootstrap CI:
+boot.ci(boot_out, type="stud")
+
+
+
+# PERCENTILE BOOTSTRAP:
+# We can use the same classical bootstrap output
+
+# Get bootstrap CI:
+boot.ci(boot_out, type="perc")
+
+
+
+# SMOOTHED BOOTSTRAP: 
+# This technique involves adding a random noise to the data
+
+# Smoothed bootstrap function:
+smoothed_bootstrap <- function(data, statistic, R) {
+  n <- length(data)
+  results <- numeric(R)
+  for(i in seq_len(R)) {
+    resample <- data + rnorm(n, mean = 0, sd = sd(data))
+    results[i] <- statistic(resample)
+  }
+  return(results)
+}
+# perform bootstrap and get bootstrap CI:
+R <- 1000
+results <- smoothed_bootstrap(my_data, mean, R)
+quantile(results, probs = c(0.025, 0.975))
+
+
+
+# SUBSAMPLING: 
+# Here we randomly sample a portion of the data.
+
+# Subsampling function:
+subsampling <- function(data, statistic, m, R) {
+  n <- length(data)
+  results <- numeric(R)
+  for(i in seq_len(R)) {
+    resample <- sample(data, m)
+    results[i] <- statistic(resample)
+  }
+  return(results)
+}
+# perform subsampling and get bootstrap CI:
+m <- 15 # half of the data
+results <- subsampling(my_data, mean, m, R)
+quantile(results, probs = c(0.025, 0.975))
+
+
+
+# PARAMETRIC BOOTSTRAP: 
+# This involves fitting a model to the data and then # drawing samples 
+# from this fitted model
+
+# Fit a normal distribution to the data:
+fit <- fitdistr(my_data, "normal")
+# perform parametric bootstrap:
+sim_data <- rnorm(R, fit$estimate[1], fit$estimate[2])
+sim_means <- replicate(R, mean(sim_data))
+# get bootstrap CI:
+quantile(sim_means, probs = c(0.025, 0.975))
+
+
+
+# JACKKNIFE: 
+# This involves systematically leaving out one observation at a time 
+# and recalculating the statistic of interest.
+
+# perform jackknife:
+jack_out <- jackknife(my_data, mean)
+# calculate jackknife pseudovalues:
+pseudovalues <- length(my_data) * mean(my_data) - (length(my_data) - 1) * jack_out$jack.values
+# get jackknife CI:
+quantile(pseudovalues, probs = c(0.025, 0.975))
+
+
