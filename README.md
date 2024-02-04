@@ -1,2 +1,7 @@
 # bootstrap
-This repository contains R scripts pertinent to bootstrap
+This repository contains R scripts pertinent to bootstrap.
+Bootstrap is a powerful statistical technique used to estimate the distribution of a statistic (such as the mean, median, variance, etc.) based on a random sample from a population. This method is particularly useful in situations where the theoretical distribution of the statistic is complex or unknown, or when the sample size is too small to confidently use parametric methods that rely on assumptions about the population distribution.
+The core idea behind the bootstrap is to generate a large number of "bootstrap samples" which are essentially random samples drawn with replacement from the original sample. This process mimics the process of obtaining real samples from the underlying population. For each bootstrap sample, the statistic of interest is calculated, resulting in a distribution of bootstrap statistics. This distribution can then be used to make inferences about the parameter, such as constructing confidence intervals or testing hypotheses.
+Bootstrap methods represent a nonparametric approach, meaning they do not make assumptions about the form of the population distribution from which the sample is drawn. These methods utilize the principles of Monte Carlo methods by employing random sampling with replacement to create a distribution of the statistic of interest.
+The distribution obtained from the bootstrap samples provides an empirical approximation of the sampling distribution of the statistic under study. This allows statisticians to estimate various properties of the statistic, such as its bias, variance, confidence intervals, or to perform hypothesis testing.
+
